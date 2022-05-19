@@ -5,13 +5,16 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
+import React from 'react';
+import Clarifai from 'clarifai';
+import FaceRecognition from './components/FaceRecognition/FaceRecognition';
+
+
+const app = new Clarifai.App({
+ apiKey: 'b887f455a0fb441e8a7626372d91b51c'
+});
 
 const particleObjects = {
-  // background: {
-  //   color: {
-  //     value: "#e896fa",
-  //   },
-  // },
   fpsLimit: 120,
   interactivity: {
     events: {
@@ -79,15 +82,56 @@ const particleObjects = {
   detectRetina: true,
 }
 
-function App() {
-  const particlesInit = async (main) => {
-    console.log(main);
-    await loadFull(main);
-  };
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      input: '',
+      imageUrl: '',
+      box:{},
+    }
+  }
 
-  const particlesLoaded = (container) => {
-    console.log(container);
-  };
+  calculateFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('inputimage');
+    const width = Number(image.width);
+    const height = Number(image.height);
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row * height),
+    }
+  }
+
+  displayFaceBox = (box) => {
+    console.log(box);
+    this.setState({box:box});
+  }
+
+  onInputChange = (event) => {
+    this.setState({input: event.target.value})
+  }
+
+  onSubmit = () => {
+    this.setState({imageUrl:this.state.input})
+    app.models
+    .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
+    .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
+    .catch(error => console.log(error))
+  }
+
+ 
+  render(){
+    const particlesInit = async (main) => {
+      // console.log(main);
+      await loadFull(main);
+    };
+  
+    const particlesLoaded = (container) => {
+      // console.log(container);
+    };
   return (
     <div className="App">
       <Particles
@@ -96,14 +140,15 @@ function App() {
       init={particlesInit}
       loaded={particlesLoaded}
       options={particleObjects}
-    />
+      />
         <Navigation />
         <Logo />
         <Rank />
-        <ImageLinkForm />
-        {/* <FaceRecognition /> */}
+        <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
+        <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}/>
     </div>
   );
+}
 }
 
 export default App;

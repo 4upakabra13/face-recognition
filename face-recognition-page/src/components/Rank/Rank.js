@@ -9,7 +9,7 @@ const Rank = () => {
         {'Nikita your rank is...'}
        </div>
        <div className="relative Gumball white f1"> 
-        {'5'}
+        {'# 5'}
        </div>
       </div>
     );
