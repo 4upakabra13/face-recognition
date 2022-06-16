@@ -2,6 +2,8 @@
 
 <h2> Project architecture</h2>
 
-Front-end build using React
-Back-end build using node, express, bcrypt, knex, cors
-and postgresql database
+```yaml
+Front-end: build using React;
+Back-end: build using node, express, bcrypt, knex, cors;
+DB: postgresql;
+```
