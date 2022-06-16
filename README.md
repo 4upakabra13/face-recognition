@@ -3,7 +3,7 @@
 <h2> Project architecture</h2>
 
 ```yaml
-Front-end: build using React;
-Back-end: build using node, express, bcrypt, knex, cors;
-DB: postgresql;
+Front-end: React;
+Back-end: Node, Express, Bcrypt, Knex, Cors;
+DB: Postgresql;
 ```
