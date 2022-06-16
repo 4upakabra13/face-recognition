@@ -10,6 +10,8 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 
+
+// Background with interactive particles
 const particleObjects = {
   fpsLimit: 120,
   interactivity: {
@@ -80,16 +82,16 @@ const particleObjects = {
 
 const initialState = {
   input: '',
-      imageUrl: '',
-      box:{},
-      route:'signin',
-      isSignedIn: false,
-      user:{
-        id:'',
-        name:'',
-        email:'',
-        entries: 0,
-        joined: ''
+    imageUrl: '',
+    box:{},
+    route:'signin',
+    isSignedIn: false,
+    user:{
+      id:'',
+      name:'',
+      email:'',
+      entries: 0,
+      joined: ''
   }
 }
 
@@ -108,9 +110,9 @@ class App extends React.Component {
         email:'',
         entries: 0,
         joined: ''
-      }
     }
   }
+}
   
  loadUser = (data) => {
    this.setState({
@@ -135,65 +137,63 @@ class App extends React.Component {
       topRow: clarifaiFace.top_row * height,
       rightCol: width - (clarifaiFace.right_col * width),
       bottomRow: height - (clarifaiFace.bottom_row * height),
-    }
   }
+}
 
-  displayFaceBox = (box) => {
-    this.setState({box:box});
-  }
+displayFaceBox = (box) => {
+  this.setState({box:box});
+}
 
-  onInputChange = (event) => {
-    this.setState({input: event.target.value})
-  }
+onInputChange = (event) => {
+  this.setState({input: event.target.value})
+}
 
-  onSubmit = () => {
-    this.setState({imageUrl:this.state.input});
-    fetch('http://localhost:3000/imageurl', {
-          method:'post',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-          input: this.state.input
-          }) 
-    })
-    .then(response => response.json())
-    .then(response => {
-      if (response){
-        fetch('http://localhost:3000/image', {
-          method:'put',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-          id: this.state.user.id
-          })
+onSubmit = () => {
+  this.setState({imageUrl:this.state.input});
+  fetch('http://localhost:3000/imageurl', {
+    method:'post',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+    input: this.state.input
+    }) 
+  })
+  .then(response => response.json())
+  .then(response => {
+    if (response){
+      fetch('http://localhost:3000/image', {
+        method:'put',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+        id: this.state.user.id
         })
-        .then(response => response.json())
-        .then(count => {
-          this.setState(Object.assign(this.state.user, { entries: count}))
-        })
-        .catch(console.log)
-      }
-      this.displayFaceBox(this.calculateFaceLocation(response))
-    })
-    .catch(error => console.log(error))
-  }
-
-  onRouteChange = (route) => {
-    if(route === 'signout'){
-      this.setState(initialState)
-    }else if (route === 'home'){
-      this.setState({isSignedIn:true})
+      })
+      .then(response => response.json())
+      .then(count => {this.setState(Object.assign(this.state.user, { entries: count}))
+      })
+      .catch(console.log)
     }
-    this.setState({route: route});
-  }
+    this.displayFaceBox(this.calculateFaceLocation(response))
+  })
+  .catch(error => console.log(error))
+}
 
-  render(){
-    const particlesInit = async (main) => {
-     
-      await loadFull(main);
-    };
+onRouteChange = (route) => {
+  if(route === 'signout'){
+    this.setState(initialState)
+  }else if (route === 'home'){
+    this.setState({isSignedIn:true})
+  }
+  this.setState({route: route});
+}
+
+render(){
+  const particlesInit = async (main) => { 
+    await loadFull(main);
+  };
   
-    const particlesLoaded = (container) => {
+  const particlesLoaded = (container) => {
      
-    };
+  };
   return (
     <div className="App">
       <Particles
@@ -203,28 +203,27 @@ class App extends React.Component {
       loaded={particlesLoaded}
       options={particleObjects}
       />
-        <Navigation isSignedIn={this.state.isSignedIn} onRouteChange={this.onRouteChange}/>
-        
-          {this.state.route === 'home' 
-          ? <div>
-              <Logo />
-              <Rank 
-              name = {this.state.user.name}
-              entries = {this.state.user.entries}
-              />
-              <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
-              <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}/>
-            </div>
-          : (
-            this.state.route === 'signin'
-            ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-            : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-          )
+      <Navigation isSignedIn={this.state.isSignedIn} onRouteChange={this.onRouteChange}/>
+      {this.state.route === 'home' 
+      ? <div>
+      <Logo />
+      <Rank 
+        name = {this.state.user.name}
+        entries = {this.state.user.entries}
+      />
+      <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
+      <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}/>
+      </div>
+      : (
+      this.state.route === 'signin'
+      ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+      : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+        )
           
-          }
+      }
     </div>
-  );
-}
+    );
+  }
 }
 
 export default App;
